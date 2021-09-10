@@ -6319,8 +6319,8 @@ class Mask {
 
             el
                .on('keydown.mask', function (e) {
-                  el.data('mask-keycode', e.keyCode || e.which);
-                  el.data('mask-previus-value', el.val());
+                  data(el, 'mask-keycode', e.keyCode || e.which);
+                  data(el, 'mask-previus-value', el.val());
                })
                .on(window.jMaskGlobals.useInput ? 'input.mask' : 'keyup.mask', function (e) {
                   that.behaviour(e);
@@ -6331,13 +6331,13 @@ class Mask {
                   }, 100);
                })
                .on('change.mask', function () {
-                  el.data('changed', true);
+                  data(el, 'changed', true);
                })
                .on('blur.mask', function () {
-                  if (oldValue !== this.val() && !el.data('changed')) {
+                  if (oldValue !== this.val() && !data(el, 'changed')) {
                      el.trigger('change');
                   }
-                  el.data('changed', false);
+                  data(el, 'changed', false);
                })
                // it's very important that this callback remains in this position
                // otherwhise oldValue it's going to work buggy
@@ -6411,11 +6411,11 @@ class Mask {
          },
          calculateCaretPosition: function (caretPos, newVal) {
             var newValL = newVal.length,
-               oValue = el.data('mask-previus-value'),
+               oValue = window.data(el, 'mask-previus-value'),
                oValueL = oValue.length;
 
             // edge cases when erasing digits
-            if (el.data('mask-keycode') === 8 && oValue !== newVal) {
+            if (data(el, 'mask-keycode') === 8 && oValue !== newVal) {
                caretPos = caretPos - (newVal.slice(0, caretPos).length - oValue.slice(0, caretPos).length);
 
                // edge cases when typing new digits
@@ -6434,9 +6434,9 @@ class Mask {
             e = e || window.event;
             this.invalid = [];
 
-            var keyCode = el.data('mask-keycode');
+            var keyCode = data(el, 'mask-keycode');
 
-            if ($.inArray(keyCode, jMask.byPassKeys) === -1) {
+            if (window.inArray(keyCode, jMask.byPassKeys) === -1) {
                var newVal = this.getMasked(),
                   caretPos = this.getCaret();
 
@@ -6583,9 +6583,9 @@ class Mask {
 
          jMask.clearIfNotMatch = window.jMaskGlobals.clearIfNotMatch;
          jMask.byPassKeys = window.jMaskGlobals.byPassKeys;
-         jMask.translation = $.extend({}, window.jMaskGlobals.translation, options.translation);
+         jMask.translation = window.extend({}, window.jMaskGlobals.translation, options.translation);
 
-         jMask = $.extend(true, {}, jMask, options);
+         jMask = window.extend({}, jMask, options);
 
          regexMask = this.p.getRegexMask();
 
@@ -6600,7 +6600,7 @@ class Mask {
             // this is necessary, otherwise if the user submit the form
             // and then press the "back" button, the autocomplete will erase
             // the data. Works fine on IE9+, FF, Opera, Safari.
-            if (el.data('mask')) {
+            if (data(el, 'mask')) {
                el.attr('autocomplete', 'off');
             }
 
@@ -6630,6 +6630,368 @@ class Mask {
       jMask.init(!el.is('input'));
    }
 };
+
+function UserData() {
+   this.expando = jQuery.expando + UserData.uid++;
+}
+
+UserData.uid = 1;
+
+UserData.prototype = {
+   cache: function (owner) {
+
+      // Check if the owner object already has a cache
+      var value = owner[this.expando];
+
+      // If not, create one
+      if (!value) {
+         value = Object.create(null);
+
+         // We can accept data for non-element nodes in modern browsers,
+         // but we should not, see #8335.
+         // Always return an empty object.
+         if (acceptData(owner)) {
+
+            // If it is a node unlikely to be stringify-ed or looped over
+            // use plain assignment
+            if (owner.nodeType) {
+               owner[this.expando] = value;
+
+               // Otherwise secure it in a non-enumerable property
+               // configurable must be true to allow the property to be
+               // deleted when data is removed
+            } else {
+               Object.defineProperty(owner, this.expando, {
+                  value: value,
+                  configurable: true
+               });
+            }
+         }
+      }
+
+      return value;
+   },
+   set: function (owner, data, value) {
+      var prop,
+         cache = this.cache(owner);
+
+      // Handle: [ owner, key, value ] args
+      // Always use camelCase key (gh-2257)
+      if (typeof data === "string") {
+         cache[camelCase(data)] = value;
+
+         // Handle: [ owner, { properties } ] args
+      } else {
+
+         // Copy the properties one-by-one to the cache object
+         for (prop in data) {
+            cache[camelCase(prop)] = data[prop];
+         }
+      }
+      return cache;
+   },
+   get: function (owner, key) {
+      return key === undefined ?
+         this.cache(owner) :
+
+         // Always use camelCase key (gh-2257)
+         owner[this.expando] && owner[this.expando][camelCase(key)];
+   },
+   access: function (owner, key, value) {
+
+      // In cases where either:
+      //
+      //   1. No key was specified
+      //   2. A string key was specified, but no value provided
+      //
+      // Take the "read" path and allow the get method to determine
+      // which value to return, respectively either:
+      //
+      //   1. The entire cache object
+      //   2. The data stored at the key
+      //
+      if (key === undefined ||
+         ((key && typeof key === "string") && value === undefined)) {
+
+         return this.get(owner, key);
+      }
+
+      // When the key is not a string, or both a key and value
+      // are specified, set or extend (existing objects) with either:
+      //
+      //   1. An object of properties
+      //   2. A key and value
+      //
+      this.set(owner, key, value);
+
+      // Since the "set" path can have two possible entry points
+      // return the expected data based on which path was taken[*]
+      return value !== undefined ? value : key;
+   },
+   remove: function (owner, key) {
+      var i,
+         cache = owner[this.expando];
+
+      if (cache === undefined) {
+         return;
+      }
+
+      if (key !== undefined) {
+
+         // Support array or space separated string of keys
+         if (Array.isArray(key)) {
+
+            // If key is an array of keys...
+            // We always set camelCase keys, so remove that.
+            key = key.map(camelCase);
+         } else {
+            key = camelCase(key);
+
+            // If a key with the spaces exists, use it.
+            // Otherwise, create an array by matching non-whitespace
+            key = key in cache ?
+               [key] :
+               (key.match(rnothtmlwhite) || []);
+         }
+
+         i = key.length;
+
+         while (i--) {
+            delete cache[key[i]];
+         }
+      }
+
+      // Remove the expando if there's no more data
+      if (key === undefined || jQuery.isEmptyObject(cache)) {
+
+         // Support: Chrome <=35 - 45+
+         // Webkit & Blink performance suffers when deleting properties
+         // from DOM nodes, so set to undefined instead
+         // https://bugs.chromium.org/p/chromium/issues/detail?id=378607 (bug restricted)
+         if (owner.nodeType) {
+            owner[this.expando] = undefined;
+         } else {
+            delete owner[this.expando];
+         }
+      }
+   },
+   hasData: function (owner) {
+      var cache = owner[this.expando];
+      return cache !== undefined && !jQuery.isEmptyObject(cache);
+   }
+};
+
+function acceptData(owner) {
+
+   // Accepts only:
+   //  - Node
+   //    - Node.ELEMENT_NODE
+   //    - Node.DOCUMENT_NODE
+   //  - Object
+   //    - Any
+   return owner.nodeType === 1 || owner.nodeType === 9 || !(+owner.nodeType);
+}
+
+// Matches dashed string for camelizing
+var rdashAlpha = /-([a-z])/g;
+
+// Used by camelCase as callback to replace()
+function fcamelCase(_all, letter) {
+   return letter.toUpperCase();
+}
+
+// Convert dashed to camelCase
+function camelCase(string) {
+   return string.replace(rdashAlpha, fcamelCase);
+}
+
+window.each = function(obj, callback) {
+   var length, i = 0;
+
+   if (isArrayLike(obj)) {
+      length = obj.length;
+      for (; i < length; i++) {
+         if (callback.call(obj[i], i, obj[i]) === false) {
+            break;
+         }
+      }
+   } else {
+      for (i in obj) {
+         if (callback.call(obj[i], i, obj[i]) === false) {
+            break;
+         }
+      }
+   }
+
+   return obj;
+}
+
+var arr = [];
+
+var indexOf = arr.indexOf;
+
+var class2type = {};
+
+function isWindow(obj) {
+   return obj != null && obj === obj.window;
+}
+
+window.access = function(elems, fn, key, value, chainable, emptyGet, raw) {
+   var i = 0,
+      len = elems.length,
+      bulk = key == null;
+
+   // Sets many values
+   if (this.toType(key) === "object") {
+      chainable = true;
+      for (i in key) {
+         access(elems, fn, i, key[i], true, emptyGet, raw);
+      }
+
+      // Sets one value
+   } else if (value !== undefined) {
+      chainable = true;
+
+      if (typeof value !== "function") {
+         raw = true;
+      }
+
+      if (bulk) {
+
+         // Bulk operations run against the entire set
+         if (raw) {
+            fn.call(elems, value);
+            fn = null;
+
+            // ...except when executing function values
+         } else {
+            bulk = fn;
+            fn = function (elem, _key, value) {
+               return bulk.call(jQuery(elem), value);
+            };
+         }
+      }
+
+      if (fn) {
+         for (; i < len; i++) {
+            fn(
+               elems[i], key, raw ?
+               value :
+               value.call(elems[i], i, fn(elems[i], key))
+            );
+         }
+      }
+   }
+
+   if (chainable) {
+      return elems;
+   }
+
+   // Gets
+   if (bulk) {
+      return fn.call(elems);
+   }
+
+   return len ? fn(elems[0], key) : emptyGet;
+}
+
+window.toType = function(obj) {
+   if (obj == null) {
+      return obj + "";
+   }
+
+   return typeof obj === "object" ?
+      class2type[toString.call(obj)] || "object" :
+      typeof obj;
+}
+
+window.data = function(element, key, value) {
+   var i, name, data,
+      elem = element[0],
+      attrs = elem && elem.attributes;
+
+   // Gets all values
+   if (key === undefined) {
+      if (this.length) {
+         data = dataUser.get(elem);
+
+         if (elem.nodeType === 1 && !dataPriv.get(elem, "hasDataAttrs")) {
+            i = attrs.length;
+            while (i--) {
+
+               // Support: IE 11+
+               // The attrs elements can be null (#14894)
+               if (attrs[i]) {
+                  name = attrs[i].name;
+                  if (name.indexOf("data-") === 0) {
+                     name = camelCase(name.slice(5));
+                     dataAttr(elem, name, data[name]);
+                  }
+               }
+            }
+            dataPriv.set(elem, "hasDataAttrs", true);
+         }
+      }
+
+      return data;
+   }
+
+   // Sets multiple values
+   if (typeof key === "object") {
+      return each(element, function () {
+         dataUser.set(element, key);
+      });
+   }
+
+   return access(this, function (value) {
+      var data;
+
+      // The calling jQuery object (element matches) is not empty
+      // (and therefore has an element appears at this[ 0 ]) and the
+      // `value` parameter was not undefined. An empty jQuery object
+      // will result in `undefined` for elem = this[ 0 ] which will
+      // throw an exception if an attempt to read a data cache is made.
+      if (elem && value === undefined) {
+
+         // Attempt to get data from the cache
+         // The key will always be camelCased in Data
+         data = dataUser.get(elem, key);
+         if (data !== undefined) {
+            return data;
+         }
+
+         // Attempt to "discover" the data in
+         // HTML5 custom data-* attrs
+         data = dataAttr(elem, key);
+         if (data !== undefined) {
+            return data;
+         }
+
+         // We tried really hard, but the data doesn't exist.
+         return;
+      }
+
+      // Set the data...
+      this.each(elem, function () {
+
+         // We always store the camelCased key
+         dataUser.set(element, key, value);
+      });
+   }, null, value, arguments.length > 1, null, true);
+}
+
+window.isArrayLike = function(obj) {
+
+   var length = !!obj && obj.length,
+      type = toType(obj);
+
+   if (typeof obj === "function" || isWindow(obj)) {
+      return false;
+   }
+
+   return type === "array" || length === 0 ||
+      typeof length === "number" && length > 0 && (length - 1) in obj;
+}
 
 class RMask {
    constructor(selector) {
@@ -6677,7 +7039,7 @@ class RMask {
          }
 
          if (notSameMaskObject(input, mask, options)) {
-            return input.data('mask', new Mask(this.elem, mask, options));
+            return data(input, 'mask', new Mask(this.elem, mask, options));
          }
       };
 
@@ -6692,6 +7054,12 @@ class RMask {
             this.applyDataMask();
          }
       }, this.globals.watchInterval);
+
+      // Make some helper functions available
+
+      window.inArray = this.inArray;
+      window.extend = this.extend;
+      window.dataUser = new UserData();
    }
 
    extend() {
@@ -6703,9 +7071,13 @@ class RMask {
       return arguments[0];
    }
 
+   inArray(elem, arr, i) {
+      return arr == null ? -1 : indexOf.call(arr, elem, i);
+   }
+
    notSameMaskObject(field, mask, options) {
       options = options || {};
-      var maskObject = $(field).data('mask'),
+      var maskObject = data($(field), field, 'mask'),
          stringify = JSON.stringify,
          value = $(field).val() || $(field).text();
       try {
@@ -6733,7 +7105,7 @@ class RMask {
 
    maskFunction = function (mask, options) {
       if (this.notSameMaskObject(this.elem, mask, options)) {
-         return this.elem.data('mask', new Mask(this.elem, mask, options));
+         return window.data(this.elem, 'mask', new Mask(this.elem, mask, options));
       }
    };
 
@@ -6761,10 +7133,10 @@ class RMask {
    };
 
    unmask() {
-      clearInterval($.maskWatchers[this.selector]);
-      delete $.maskWatchers[this.selector];
+      clearInterval(this.maskWatchers[this.selector]);
+      delete this.maskWatchers[this.selector];
       return this.each(function () {
-         var dataMask = $(this).data('mask');
+         var dataMask = data($(this), 'mask');
          if (dataMask) {
             dataMask.remove().removeData('mask');
          }
@@ -6772,7 +7144,7 @@ class RMask {
    };
 
    cleanVal() {
-      return this.data('mask').getCleanVal();
+      return data(this, 'mask').getCleanVal();
    };
 
    applyDataMask(selector) {
