@@ -853,6 +853,8 @@ class RMask {
          }
       }, this.globals.watchInterval);
 
+      this.selector = selector;
+
       // Make some helper functions available
 
       window.inArray = this.inArray;
@@ -916,13 +918,16 @@ class RMask {
       this.maskFunction(mask, options);
 
       if (selector && selector !== '' && watchInputs) {
-
          clearInterval(this.maskWatchers[selector]);
 
-         this.maskWatchers[selector] = setInterval(function () {
-            $(document).find(selector).each(maskFunction);
+         this.maskWatchers[selector] = setInterval(() => {
+            var fields = document.querySelectorAll(selector)
+            fields.forEach(event => {
+               this.maskFunction(mask, options);
+            });
          }, interval);
       }
+
       return this;
    };
 
@@ -935,6 +940,7 @@ class RMask {
       delete this.maskWatchers[this.selector];
       return this.each(function () {
          var dataMask = data($(this), 'mask');
+
          if (dataMask) {
             dataMask.remove().removeData('mask');
          }
@@ -947,12 +953,10 @@ class RMask {
 
    applyDataMask(selector) {
       selector = selector || this.globals.maskElements;
-      // var $selector = (selector instanceof $) ? selector : $(selector);
+
       var elements = document.querySelectorAll(this.globals.dataMaskAttr);
 
       elements.forEach(this.HTMLAttributes);
-
-      //$selector.filter(this.globals.dataMaskAttr).each(this.HTMLAttributes);
    };
 }
 
