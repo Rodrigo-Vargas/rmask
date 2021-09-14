@@ -1,5 +1,31 @@
 // =====================================================
 
+var rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
+	rmultiDash = /[A-Z]/g;
+
+function dataAttr( elem, key, data ) {
+	var name;
+
+	// If nothing was found internally, try to fetch any
+	// data from the HTML5 data-* attribute
+	if ( data === undefined && elem.nodeType === 1 ) {
+		name = "data-" + key.replace( rmultiDash, "-$&" ).toLowerCase();
+		data = elem.getAttribute( name );
+
+		if ( typeof data === "string" ) {
+			try {
+				data = getData( data );
+			} catch ( e ) {}
+
+			// Make sure we set the data so it isn't changed later
+			dataUser.set( elem, key, data );
+		} else {
+			data = undefined;
+		}
+	}
+	return data;
+}
+
 var _listeners = [];
 
 EventTarget.prototype.addEventListenerBase = EventTarget.prototype.addEventListener;
@@ -365,7 +391,7 @@ class Mask {
             this.p.val(this.p.getMasked());
          } else {
             if (options.placeholder) {
-               el.attr('placeholder', options.placeholder);
+               el.setAttribute('placeholder', options.placeholder);
             }
 
             // this is necessary, otherwise if the user submit the form
