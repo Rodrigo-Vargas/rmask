@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+
+   <meta name="description" content="RMask - A vanilla JS plugin to make field masks" />
+   <meta name="author" content="Rodrigo Vagas" />
+   <title>RMask - A vanilla JS plugin to make field masks on form fields and html elements.</title>
+
+   <link href="https://fonts.googleapis.com/css?family=Chivo:400,700" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700" rel="stylesheet">
+
+   <link rel="stylesheet" href="css/main.css" type="text/css" media="screen">
+   <link rel="stylesheet" href="https://yandex.st/highlightjs/7.3/styles/default.min.css">
+
+   <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+</head>
+
+<body>
+   <div class="donate">
+      <div class="container">
+         <p>Help keep this project alive</p>
+
+         <ul>
+            <li>
+               <a href="#" class="link-small paypal-amount" data-amount="5">$5</a>
+            </li>
+            <li>
+               <a href="#" class="link-small paypal-amount" data-amount="10">$10</a>
+            </li>
+            <li>
+               <a href="#" class="link-small paypal-amount" data-amount="20">$20</a>
+            </li>
+            <li>
+               <a href="#" class="link-small paypal-amount" data-amount="50">$50</a>
+            </li>
+            <li>
+               <a href="#" target="_blank" class="link-small paypal-donate">Donate</a>
+            </li>
+         </ul>
+
+         <i class="hidden">Close</i>
+      </div>
+   </div>
+
+   <div class="hero home">
+      <div class="container">
+         <div class="navigation">
+            <nav>
+               <a href="/" class="selected">Home</a>
+               <a href="/docs.html">Docs</a>
+               <a href="https://github.com/rodrigo-vargas/rmask">On Github</a>
+               <a class="github-button" href="https://github.com/rodrigo-vargas/rmask" data-style="mega"
+                  data-count-href="/rodrigo-vargas/rmask/stargazers"
+                  data-count-api="/repos/rodrigo-vargas/rmask#stargazers_count"
+                  data-count-aria-label="# stargazers on GitHub"
+                  aria-label="Star rodrigo-vargas/rmask on GitHub">Star</a>
+            </nav>
+         </div>
+
+         <h1>RMask</h1>
+         <h3>A plugin to make masks on form fields</h3>
+
+         <a href="https://github.com/rodrigo-vargas/rmask/archive/master.zip" class="button-large">Download
+            Now</a>
+
+         <a href="#examples" class="arrow-down"></a>
+      </div>
+   </div>
+
+   <section class="examples">
+      <div class="container">
+         <h3 id="examples">View in action</h3>
+
+         <div class="inputs">
+            <div class="input-group">
+               <label for="date">Date</label>
+               <input type="text" class="date" id="date" />
+            </div>
+
+            <div class="input-group">
+               <label for="time">Hour</label>
+               <input type="text" class="time" id="time" />
+            </div>
+
+            <div class="input-group">
+               <label for="date_time">Date &amp; Hour</label>
+               <input type="text" class="date_time" id="date_time" />
+            </div>
+
+            <div class="input-group">
+               <label for="cep">ZIP Code</label>
+               <input type="text" class="cep" id="cep" />
+            </div>
+
+            <div class="input-group">
+               <label for="cep_with_callback">With Callbacks (open console)</label>
+               <input type="text" class="cep_with_callback" id="cep_with_callback" />
+            </div>
+
+            <div class="input-group">
+               <label for="crazy_cep">Crazy Zip Code</label>
+               <input type="text" class="crazy_cep" id="crazy_cep" />
+            </div>
+
+            <div class="input-group">
+               <label for="money">Money</label>
+               <input type="text" class="money" id="money" />
+            </div>
+
+            <div class="input-group">
+               <label for="placeholder">Mask placeholder option</label>
+               <input type="text" class="placeholder" id="placeholder" />
+            </div>
+
+            <div class="input-group">
+               <label for="placeholder">Masks on div elements!</label>
+               <input type="text" class="placeholder" id="placeholder" />
+            </div>
+
+            <div class="input-group">
+               <label for="phone">Telephone</label>
+               <input type="text" class="phone" id="phone" />
+            </div>
+
+            <div class="input-group">
+               <label for="phone_with_ddd">Telephone with Code Area</label>
+               <input type="text" class="phone_with_ddd" id="phone_with_ddd" />
+            </div>
+
+            <div class="input-group">
+               <label for="phone_us">US Telephone</label>
+               <input type="text" class="phone_us" id="phone_us" />
+            </div>
+
+            <div class="input-group">
+               <label for="sp_celphones">São Paulo Celphones</label>
+               <input type="text" class="sp_celphones" id="sp_celphones" />
+            </div>
+
+            <div class="input-group">
+               <label for="mixed">Mixed Type Mask</label>
+               <input type="text" class="mixed" id="mixed" />
+            </div>
+
+            <div class="input-group">
+               <label for="cpf">CPF</label>
+               <input type="text" class="cpf" id="cpf" />
+            </div>
+
+            <div class="input-group">
+               <label for="cnpj">CNPJ</label>
+               <input type="text" class="cnpj" id="cnpj" />
+            </div>
+
+            <div class="input-group">
+               <label for="ip_address">IP Address</label>
+               <input type="text" class="ip_address" id="ip_address" />
+            </div>
+
+            <div class="input-group">
+               <label for="clear-if-not-match">With Clear If Not Match Option</label>
+               <input type="text" class="clear-if-not-match" id="clear-if-not-match" />
+            </div>
+
+            <div class="input-group">
+               <label for="fallback">With a fallback digit</label>
+               <input type="text" class="fallback" id="fallback" />
+            </div>
+
+            <div class="input-group">
+               <label for="selectonfocus">With selectOnFocus</label>
+               <input type="text" class="selectonfocus" id="selectonfocus" />
+            </div>
+         </div>
+
+         <label>Masks on div elements!</label>
+         <div class="mask-on-div">12345678909</div> <input type="button" class="bt-mask-it" value="Mask it!" />
+      </div>
+   </section>
+
+   <footer>
+      <div class="container">
+         <img src="./img/author.png" alt="">
+         <h3>Created by Rodrigo Vargas</h3>
+
+         <ol>
+            <li>
+               <a href="https://twitter.com/rodrigo-vargas" target="_blank">Twitter</a>
+            </li>
+
+            <li>
+               <a href="https://github.com/rodrigo-vargas" target="_blank">Github</a>
+            </li>
+
+            <li>
+               <a href="https://rodrigovargas.com.br" target="_blank">rodrigovargas.com.br</a>
+            </li>
+         </ol>
+      </div>
+   </footer>
+
+   <script src="https://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+   <script type="text/javascript" src="js/rmask.js"></script>
+
+   <script src="js/examples.js"></script>
+   <script src="js/donation.js"></script>
+</body>
+
+</html>
