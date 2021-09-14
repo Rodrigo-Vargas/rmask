@@ -391,7 +391,7 @@ class Mask {
             this.p.val(this.p.getMasked());
          } else {
             if (options.placeholder) {
-               el.attr('placeholder', options.placeholder);
+               el.setAttribute('placeholder', options.placeholder);
             }
 
             // this is necessary, otherwise if the user submit the form
