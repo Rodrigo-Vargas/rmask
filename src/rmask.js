@@ -62,7 +62,7 @@ EventTarget.prototype.off = function (events) {
 
 
 class Mask {
-   constructor(el, mask, options) {
+   constructor(el, selector, mask, options) {
       this.p = {
          invalid: [],
          getCaret: function () {
@@ -234,8 +234,8 @@ class Mask {
             var keyCode = data(el, 'mask-keycode');
 
             if (window.inArray(keyCode, jMask.byPassKeys) === -1) {
-               var newVal = this.getMasked(),
-                  caretPos = this.getCaret();
+               var newVal = this.getMasked();
+               var caretPos = this.getCaret();
 
                setTimeout((caretPos, newVal) => {
                   this.setCaret(this.calculateCaretPosition(caretPos, newVal));
@@ -334,7 +334,7 @@ class Mask {
          callbacks: function (e) {
             var val = this.val(),
                changed = val !== oldValue,
-               defaultArgs = [val, e, el, options],
+               defaultArgs = [val, e, el, selector, options],
                callback = function (name, criteria, args) {
                   if (typeof options[name] === 'function' && criteria) {
                      options[name].apply(this, args);
@@ -348,28 +348,27 @@ class Mask {
          }
       };
 
-      // el = $(el);
       var jMask = this, oldValue = this.p.val(), regexMask;
 
-      mask = typeof mask === 'function' ? mask(this.val(), undefined, el, options) : mask;
+      mask = typeof mask === 'function' ? mask(this.p.val(), undefined, el, options) : mask;
 
       // public methods
       jMask.mask = mask;
       jMask.options = options;
       jMask.remove = function () {
          var caret = this.getCaret();
+
          this.p.destroyEvents();
          this.p.val(jMask.getCleanVal());
          this.p.setCaret(caret);
+
          return el;
       };
 
-      // get value without mask
       jMask.getCleanVal = function () {
          return this.getMasked(true);
       };
 
-      // get masked value without the value being in the input or element
       jMask.getMaskedVal = function (val) {
          return this.getMasked(false, val);
       };
@@ -816,7 +815,8 @@ class RMask {
 
       this.globals = this.extend({}, this.globals, window.jMaskGlobals);
 
-      this.elem = document.querySelector(selector);
+      if (typeof selector === "string")
+         this.elem = document.querySelector(selector);
 
       this.HTMLAttributes = function () {
          var input = $(this),
@@ -848,10 +848,10 @@ class RMask {
       window.jMaskGlobals = this.globals;
 
       setInterval(() => {
-         if (this.globals.watchDataMask) {
-            this.applyDataMask();
-         }
+         if (this.globals.watchDataMask) this.applyDataMask();
       }, this.globals.watchInterval);
+
+      this.selector = selector;
 
       // Make some helper functions available
 
@@ -902,9 +902,10 @@ class RMask {
    };
 
    maskFunction = function (mask, options) {
-      if (this.notSameMaskObject(this.elem, mask, options)) {
-         return window.data(this.elem, 'mask', new Mask(this.elem, mask, options));
-      }
+      if (!this.notSameMaskObject(this.elem, mask, options))
+         return;
+
+      return window.data(this.elem, 'mask', new Mask(this.elem, this.selector, mask, options));
    };
 
    mask(mask, options) {
@@ -916,13 +917,17 @@ class RMask {
       this.maskFunction(mask, options);
 
       if (selector && selector !== '' && watchInputs) {
-
          clearInterval(this.maskWatchers[selector]);
 
-         this.maskWatchers[selector] = setInterval(function () {
-            $(document).find(selector).each(maskFunction);
+         this.maskWatchers[selector] = setInterval(() => {
+            var fields = document.querySelectorAll(selector);
+
+            fields.forEach((event) => {
+               this.maskFunction(mask, options);
+            });
          }, interval);
       }
+
       return this;
    };
 
@@ -935,6 +940,7 @@ class RMask {
       delete this.maskWatchers[this.selector];
       return this.each(function () {
          var dataMask = data($(this), 'mask');
+
          if (dataMask) {
             dataMask.remove().removeData('mask');
          }
@@ -947,12 +953,10 @@ class RMask {
 
    applyDataMask(selector) {
       selector = selector || this.globals.maskElements;
-      // var $selector = (selector instanceof $) ? selector : $(selector);
+
       var elements = document.querySelectorAll(this.globals.dataMaskAttr);
 
       elements.forEach(this.HTMLAttributes);
-
-      //$selector.filter(this.globals.dataMaskAttr).each(this.HTMLAttributes);
    };
 }
 
