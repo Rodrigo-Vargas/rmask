@@ -67,11 +67,11 @@ class Mask {
          invalid: [],
          getCaret: function () {
             try {
-               var sel,
-                  pos = 0,
-                  ctrl = el.get(0),
-                  dSel = document.selection,
-                  cSelStart = ctrl.selectionStart;
+               var sel;
+               var pos = 0;
+               var ctrl = el;
+               var dSel = document.selection;
+               var cSelStart = ctrl.selectionStart;
 
                // IE Support
                if (dSel && navigator.appVersion.indexOf('MSIE 10') === -1) {
@@ -429,7 +429,7 @@ class Mask {
 
 function UserData() {
    var version = "1.0.0";
-   this.expando = "jQuery" + (version + Math.random()).replace(/\D/g, "") + UserData.uid++;
+   this.expando = "UserData" + (version + Math.random()).replace(/\D/g, "") + UserData.uid++;
 }
 
 UserData.uid = 1;
@@ -740,7 +740,7 @@ window.data = function(element, key, value) {
       });
    }
 
-   return access(this, function (value) {
+   return access(elem, function (value) {
       var data;
 
       // The calling jQuery object (element matches) is not empty
@@ -769,11 +769,17 @@ window.data = function(element, key, value) {
       }
 
       // Set the data...
-      this.each(elem, function () {
-
-         // We always store the camelCased key
-         dataUser.set(element, key, value);
-      });
+      if (elem.length)
+      {
+         for (var x = 0; x < elem.length; x++)
+         {
+            dataUser.set(elem[x], key, value);
+         }
+      }
+      else
+      {
+         dataUser.set(elem, key, value);
+      }
    }, null, value, arguments.length > 2, null, true);
 }
 
@@ -789,6 +795,8 @@ window.isArrayLike = function(obj) {
    return type === "array" || length === 0 ||
       typeof length === "number" && length > 0 && (length - 1) in obj;
 }
+
+window.dataUser = new UserData();
 
 class RMask {
    constructor(selector) {
@@ -857,7 +865,6 @@ class RMask {
 
       window.inArray = this.inArray;
       window.extend = this.extend;
-      window.dataUser = new UserData();
    }
 
    extend() {
@@ -875,7 +882,7 @@ class RMask {
 
    notSameMaskObject(field, mask, options) {
       options = options || {};
-      var maskObject = data(field, field, 'mask'),
+      var maskObject = data(field, 'mask'),
          stringify = JSON.stringify,
          value = field.value || field.innerText;
       try {
@@ -910,23 +917,23 @@ class RMask {
 
    mask(mask, options) {
       options = options || {};
-      var selector = this.selector;
-      var interval = this.globals.watchInterval;
-      var watchInputs = options.watchInputs || this.globals.watchInputs;
+      // var selector = this.selector;
+      // var interval = this.globals.watchInterval;
+      // var watchInputs = options.watchInputs || this.globals.watchInputs;
 
       this.maskFunction(mask, options);
 
-      if (selector && selector !== '' && watchInputs) {
-         clearInterval(this.maskWatchers[selector]);
+      // if (selector && selector !== '' && watchInputs) {
+      //    clearInterval(this.maskWatchers[selector]);
 
-         this.maskWatchers[selector] = setInterval(() => {
-            var fields = document.querySelectorAll(selector);
+      //    this.maskWatchers[selector] = setInterval(() => {
+      //       var fields = document.querySelectorAll(selector);
 
-            fields.forEach((event) => {
-               this.maskFunction(mask, options);
-            });
-         }, interval);
-      }
+      //       fields.forEach((event) => {
+      //          this.maskFunction(mask, options);
+      //       });
+      //    }, interval);
+      // }
 
       return this;
    };
