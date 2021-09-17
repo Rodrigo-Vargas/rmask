@@ -49,20 +49,19 @@ new RMask('.cnpj').mask('00.000.000/0000-00', { reverse: true });
 new RMask('.cpf').mask('000.000.000-00', { reverse: true });
 new RMask('.money').mask('#.##0,00', { reverse: true });
 
-// var SPMaskBehavior = function (val) {
-//    return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
-// },
-//    spOptions = {
-//       onKeyPress: function (val, e, field, options) {
-//          field.mask(SPMaskBehavior.apply({}, arguments), options);
-//       }
-//    };
+var SPMaskBehavior = function (val) {
+   return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+},
+   spOptions = {
+      onKeyPress: function (val, e, field, selector, options) {
+         new RMask(selector).mask(SPMaskBehavior.apply({}, arguments), options);
+      }
+   };
 
-// new RMask('.sp_celphones').mask(SPMaskBehavior, spOptions);
+new RMask('.sp_celphones').mask(SPMaskBehavior, spOptions);
 
-$(".bt-mask-it").click(function () {
-   $(".mask-on-div").mask("000.000.000-00");
-   $(".mask-on-div").fadeOut(500).fadeIn(500)
+var button = document.querySelector(".bt-mask-it");
+button.addEventListener('click', function () {
+   new RMask(".mask-on-div").mask("000.000.000-00");
+   new RMask(".mask-on-div");
 })
-
-$('pre').each(function (i, e) { hljs.highlightBlock(e) });

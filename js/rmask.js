@@ -62,16 +62,16 @@ EventTarget.prototype.off = function (events) {
 
 
 class Mask {
-   constructor(el, mask, options) {
+   constructor(el, selector, mask, options) {
       this.p = {
          invalid: [],
          getCaret: function () {
             try {
-               var sel,
-                  pos = 0,
-                  ctrl = el.get(0),
-                  dSel = document.selection,
-                  cSelStart = ctrl.selectionStart;
+               var sel;
+               var pos = 0;
+               var ctrl = el;
+               var dSel = document.selection;
+               var cSelStart = ctrl.selectionStart;
 
                // IE Support
                if (dSel && navigator.appVersion.indexOf('MSIE 10') === -1) {
@@ -234,8 +234,8 @@ class Mask {
             var keyCode = data(el, 'mask-keycode');
 
             if (window.inArray(keyCode, jMask.byPassKeys) === -1) {
-               var newVal = this.getMasked(),
-                  caretPos = this.getCaret();
+               var newVal = this.getMasked();
+               var caretPos = this.getCaret();
 
                setTimeout((caretPos, newVal) => {
                   this.setCaret(this.calculateCaretPosition(caretPos, newVal));
@@ -334,7 +334,7 @@ class Mask {
          callbacks: function (e) {
             var val = this.val(),
                changed = val !== oldValue,
-               defaultArgs = [val, e, el, options],
+               defaultArgs = [val, e, el, selector, options],
                callback = function (name, criteria, args) {
                   if (typeof options[name] === 'function' && criteria) {
                      options[name].apply(this, args);
@@ -348,28 +348,27 @@ class Mask {
          }
       };
 
-      // el = $(el);
       var jMask = this, oldValue = this.p.val(), regexMask;
 
-      mask = typeof mask === 'function' ? mask(this.val(), undefined, el, options) : mask;
+      mask = typeof mask === 'function' ? mask(this.p.val(), undefined, el, options) : mask;
 
       // public methods
       jMask.mask = mask;
       jMask.options = options;
       jMask.remove = function () {
          var caret = this.getCaret();
+
          this.p.destroyEvents();
          this.p.val(jMask.getCleanVal());
          this.p.setCaret(caret);
+
          return el;
       };
 
-      // get value without mask
       jMask.getCleanVal = function () {
          return this.getMasked(true);
       };
 
-      // get masked value without the value being in the input or element
       jMask.getMaskedVal = function (val) {
          return this.getMasked(false, val);
       };
@@ -430,7 +429,7 @@ class Mask {
 
 function UserData() {
    var version = "1.0.0";
-   this.expando = "jQuery" + (version + Math.random()).replace(/\D/g, "") + UserData.uid++;
+   this.expando = "UserData" + (version + Math.random()).replace(/\D/g, "") + UserData.uid++;
 }
 
 UserData.uid = 1;
@@ -741,7 +740,7 @@ window.data = function(element, key, value) {
       });
    }
 
-   return access(this, function (value) {
+   return access(elem, function (value) {
       var data;
 
       // The calling jQuery object (element matches) is not empty
@@ -770,11 +769,17 @@ window.data = function(element, key, value) {
       }
 
       // Set the data...
-      this.each(elem, function () {
-
-         // We always store the camelCased key
-         dataUser.set(element, key, value);
-      });
+      if (elem.length)
+      {
+         for (var x = 0; x < elem.length; x++)
+         {
+            dataUser.set(elem[x], key, value);
+         }
+      }
+      else
+      {
+         dataUser.set(elem, key, value);
+      }
    }, null, value, arguments.length > 2, null, true);
 }
 
@@ -790,6 +795,8 @@ window.isArrayLike = function(obj) {
    return type === "array" || length === 0 ||
       typeof length === "number" && length > 0 && (length - 1) in obj;
 }
+
+window.dataUser = new UserData();
 
 class RMask {
    constructor(selector) {
@@ -816,7 +823,8 @@ class RMask {
 
       this.globals = this.extend({}, this.globals, window.jMaskGlobals);
 
-      this.elem = document.querySelector(selector);
+      if (typeof selector === "string")
+         this.elem = document.querySelector(selector);
 
       this.HTMLAttributes = function () {
          var input = $(this),
@@ -848,9 +856,7 @@ class RMask {
       window.jMaskGlobals = this.globals;
 
       setInterval(() => {
-         if (this.globals.watchDataMask) {
-            this.applyDataMask();
-         }
+         if (this.globals.watchDataMask) this.applyDataMask();
       }, this.globals.watchInterval);
 
       this.selector = selector;
@@ -859,7 +865,6 @@ class RMask {
 
       window.inArray = this.inArray;
       window.extend = this.extend;
-      window.dataUser = new UserData();
    }
 
    extend() {
@@ -877,7 +882,7 @@ class RMask {
 
    notSameMaskObject(field, mask, options) {
       options = options || {};
-      var maskObject = data(field, field, 'mask'),
+      var maskObject = data(field, 'mask'),
          stringify = JSON.stringify,
          value = field.value || field.innerText;
       try {
@@ -904,29 +909,31 @@ class RMask {
    };
 
    maskFunction = function (mask, options) {
-      if (this.notSameMaskObject(this.elem, mask, options)) {
-         return window.data(this.elem, 'mask', new Mask(this.elem, mask, options));
-      }
+      if (!this.notSameMaskObject(this.elem, mask, options))
+         return;
+
+      return window.data(this.elem, 'mask', new Mask(this.elem, this.selector, mask, options));
    };
 
    mask(mask, options) {
       options = options || {};
-      var selector = this.selector;
-      var interval = this.globals.watchInterval;
-      var watchInputs = options.watchInputs || this.globals.watchInputs;
+      // var selector = this.selector;
+      // var interval = this.globals.watchInterval;
+      // var watchInputs = options.watchInputs || this.globals.watchInputs;
 
       this.maskFunction(mask, options);
 
-      if (selector && selector !== '' && watchInputs) {
-         clearInterval(this.maskWatchers[selector]);
+      // if (selector && selector !== '' && watchInputs) {
+      //    clearInterval(this.maskWatchers[selector]);
 
-         this.maskWatchers[selector] = setInterval(() => {
-            var fields = document.querySelectorAll(selector)
-            fields.forEach(event => {
-               this.maskFunction(mask, options);
-            });
-         }, interval);
-      }
+      //    this.maskWatchers[selector] = setInterval(() => {
+      //       var fields = document.querySelectorAll(selector);
+
+      //       fields.forEach((event) => {
+      //          this.maskFunction(mask, options);
+      //       });
+      //    }, interval);
+      // }
 
       return this;
    };
