@@ -908,7 +908,7 @@ class RMask {
       return isSupported;
    };
 
-   maskFunction = function (mask, options) {
+   maskFunction(mask, options) {
       if (!this.notSameMaskObject(this.elem, mask, options))
          return;
 
