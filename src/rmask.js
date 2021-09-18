@@ -967,4 +967,4 @@ class RMask {
    };
 }
 
-// export default RMask;
+export default RMask;
