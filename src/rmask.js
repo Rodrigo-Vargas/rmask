@@ -3,42 +3,42 @@
 import RMask from "./rmask.class";
 
 var rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
-	rmultiDash = /[A-Z]/g;
+   rmultiDash = /[A-Z]/g;
 
-function dataAttr( elem, key, data ) {
-	var name;
+   function dataAttr( elem, key, data ) {
+   var name;
 
-	// If nothing was found internally, try to fetch any
-	// data from the HTML5 data-* attribute
-	if ( data === undefined && elem.nodeType === 1 ) {
-		name = "data-" + key.replace( rmultiDash, "-$&" ).toLowerCase();
-		data = elem.getAttribute( name );
+   // If nothing was found internally, try to fetch any
+   // data from the HTML5 data-* attribute
+   if ( data === undefined && elem.nodeType === 1 ) {
+      name = "data-" + key.replace( rmultiDash, "-$&" ).toLowerCase();
+      data = elem.getAttribute( name );
 
-		if ( typeof data === "string" ) {
-			try {
-				data = getData( data );
-			} catch ( e ) {}
+      if ( typeof data === "string" ) {
+         try {
+            data = getData( data );
+         } catch ( e ) {}
 
-			// Make sure we set the data so it isn't changed later
-			dataUser.set( elem, key, data );
-		} else {
-			data = undefined;
-		}
-	}
-	return data;
-}
+         // Make sure we set the data so it isn't changed later
+         dataUser.set( elem, key, data );
+      } else {
+         data = undefined;
+      }
+   }
+   return data;
+   }
 
-var _listeners = [];
+var listeners = [];
 
 EventTarget.prototype.addEventListenerBase = EventTarget.prototype.addEventListener;
 EventTarget.prototype.addEventListener = function(type, listener) {
-    _listeners.push({target: this, type: type, listener: listener});
+    listeners.push({target: this, type: type, listener: listener});
     this.addEventListenerBase(type.split('.')[0], listener);
 };
 
 EventTarget.prototype.removeEventListeners = function(targetType) {
-   for (var index = 0; index !== _listeners.length; index++) {
-      var item = _listeners[index];
+   for (var index = 0; index !== listeners.length; index++) {
+      var item = listeners[index];
 
       var target = item.target;
       var type = item.type;
@@ -70,7 +70,6 @@ UserData.uid = 1;
 
 UserData.prototype = {
    cache: function (owner) {
-
       // Check if the owner object already has a cache
       var value = owner[this.expando];
 
@@ -82,7 +81,6 @@ UserData.prototype = {
          // but we should not, see #8335.
          // Always return an empty object.
          if (acceptData(owner)) {
-
             // If it is a node unlikely to be stringify-ed or looped over
             // use plain assignment
             if (owner.nodeType) {
@@ -128,7 +126,6 @@ UserData.prototype = {
          owner[this.expando] && owner[this.expando][camelCase(key)];
    },
    access: function (owner, key, value) {
-
       // In cases where either:
       //
       //   1. No key was specified
@@ -142,7 +139,6 @@ UserData.prototype = {
       //
       if (key === undefined ||
          ((key && typeof key === "string") && value === undefined)) {
-
          return this.get(owner, key);
       }
 
@@ -167,10 +163,8 @@ UserData.prototype = {
       }
 
       if (key !== undefined) {
-
          // Support array or space separated string of keys
          if (Array.isArray(key)) {
-
             // If key is an array of keys...
             // We always set camelCase keys, so remove that.
             key = key.map(camelCase);
@@ -193,7 +187,6 @@ UserData.prototype = {
 
       // Remove the expando if there's no more data
       if (key === undefined || jQuery.isEmptyObject(cache)) {
-
          // Support: Chrome <=35 - 45+
          // Webkit & Blink performance suffers when deleting properties
          // from DOM nodes, so set to undefined instead
@@ -212,7 +205,6 @@ UserData.prototype = {
 };
 
 function acceptData(owner) {
-
    // Accepts only:
    //  - Node
    //    - Node.ELEMENT_NODE
@@ -287,7 +279,6 @@ window.access = function(elems, fn, key, value, chainable, emptyGet, raw) {
       }
 
       if (bulk) {
-
          // Bulk operations run against the entire set
          if (raw) {
             fn.call(elems, value);
@@ -348,7 +339,6 @@ window.data = function(element, key, value) {
          if (elem.nodeType === 1 && !dataPriv.get(elem, "hasDataAttrs")) {
             i = attrs.length;
             while (i--) {
-
                // Support: IE 11+
                // The attrs elements can be null (#14894)
                if (attrs[i]) {
@@ -382,7 +372,6 @@ window.data = function(element, key, value) {
       // will result in `undefined` for elem = this[ 0 ] which will
       // throw an exception if an attempt to read a data cache is made.
       if (elem && value === undefined) {
-
          // Attempt to get data from the cache
          // The key will always be camelCased in Data
          data = dataUser.get(elem, key);
@@ -413,7 +402,6 @@ window.data = function(element, key, value) {
 }
 
 window.isArrayLike = function(obj) {
-
    var length = !!obj && obj.length,
       type = toType(obj);
 

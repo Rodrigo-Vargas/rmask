@@ -104,7 +104,6 @@ class Mask {
                translation = jMask.translation[mask.charAt(i)];
 
                if (translation) {
-
                   pattern = translation.pattern.toString().replace(/.{1}$|^.{1}/g, '');
                   optional = translation.optional;
                   recursive = translation.recursive;
@@ -115,7 +114,6 @@ class Mask {
                   } else {
                      maskChunks.push(!optional && !recursive ? pattern : (pattern + '?'));
                   }
-
                } else {
                   maskChunks.push(mask.charAt(i).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
                }
