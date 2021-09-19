@@ -29,24 +29,20 @@ function dataAttr( elem, key, data ) {
 var _listeners = [];
 
 EventTarget.prototype.addEventListenerBase = EventTarget.prototype.addEventListener;
-EventTarget.prototype.addEventListener = function(type, listener)
-{
+EventTarget.prototype.addEventListener = function(type, listener) {
     _listeners.push({target: this, type: type, listener: listener});
     this.addEventListenerBase(type.split('.')[0], listener);
 };
 
-EventTarget.prototype.removeEventListeners = function(targetType)
-{
-    for(var index = 0; index != _listeners.length; index++)
-    {
+EventTarget.prototype.removeEventListeners = function(targetType) {
+    for(var index = 0; index != _listeners.length; index++) {
         var item = _listeners[index];
 
         var target = item.target;
         var type = item.type;
         var listener = item.listener;
 
-        if(target == this && type == targetType)
-        {
+        if(target == this && type == targetType) {
             this.removeEventListener(type.split('.')[0], listener);
         }
     }
@@ -55,7 +51,7 @@ EventTarget.prototype.removeEventListeners = function(targetType)
 EventTarget.prototype.off = function (events) {
    events = events.split(' ');
 
-   events.forEach(event => {
+   events.forEach((event) => {
       this.removeEventListeners(event);
    })
 };
@@ -78,7 +74,9 @@ class Mask {
                   sel = dSel.createRange();
                   sel.moveStart('character', -this.val().length);
                   pos = sel.text.length;
+               // eslint-disable-next-line brace-style
                }
+
                // Firefox support
                else if (cSelStart || cSelStart === '0') {
                   pos = cSelStart;
@@ -402,7 +400,8 @@ class Mask {
 
             // detect if is necessary let the user type freely.
             // for is a lot faster than forEach.
-            for (var i = 0, maxlength = true; i < mask.length; i++) {
+            let maxlength = true;
+            for (var i = 0; i < mask.length; i++) {
                var translation = jMask.translation[mask.charAt(i)];
                if (translation && translation.recursive) {
                   maxlength = false;
@@ -769,15 +768,11 @@ window.data = function(element, key, value) {
       }
 
       // Set the data...
-      if (elem.length)
-      {
-         for (var x = 0; x < elem.length; x++)
-         {
+      if (elem.length) {
+         for (var x = 0; x < elem.length; x++) {
             dataUser.set(elem[x], key, value);
          }
-      }
-      else
-      {
+      } else {
          dataUser.set(elem, key, value);
       }
    }, null, value, arguments.length > 2, null, true);

@@ -1,8 +1,6 @@
 {
    "extends": "airbnb",
    "rules": {
-      "block-scoped-var": "off",
-      "brace-style": "off",
       "class-methods-use-this": "off",
       "comma-dangle": "off",
       "consistent-return": "off",
