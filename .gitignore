@@ -2,3 +2,7 @@ node_modules/
 .jekyll-cache
 _site
 test
+e2e_tests
+.nyc_output
+coverage
+lib

@@ -1,0 +1,6 @@
+exclude: [
+  coverage,
+  e2e_tests,
+  test,
+  lib
+]
