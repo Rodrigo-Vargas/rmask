@@ -18,10 +18,10 @@ new RMask('.fallback').mask("00r00r0000", {
    translation: {
       'r': {
          pattern: /[\/]/,
-         fallback: '/'
+         fallback: '/',
       },
-      placeholder: "__/__/____"
-   }
+      placeholder: "__/__/____",
+   },
 });
 
 new RMask('.selectonfocus').mask("00/00/0000", { selectOnFocus: true });
@@ -36,7 +36,7 @@ new RMask('.cep_with_callback').mask('00000-000', {
    onInvalid: function (val, e, field, invalid, options) {
       var error = invalid[0];
       console.log("Digit: ", error.v, " is invalid for the position: ", error.p, ". We expect something like: ", error.e);
-   }
+   },
 });
 
 new RMask('.crazy_cep').mask('00000-000', {
@@ -44,7 +44,7 @@ new RMask('.crazy_cep').mask('00000-000', {
       var masks = ['00000-000', '0-00-00-00'];
       var mask = (cep.length > 7) ? masks[1] : masks[0];
       new RMask('.crazy_cep').mask(mask, options);
-   }
+   },
 });
 
 new RMask('.cnpj').mask('00.000.000/0000-00', { reverse: true });
@@ -57,7 +57,7 @@ var SPMaskBehavior = function (val) {
    spOptions = {
       onKeyPress: function (val, e, field, selector, options) {
          new RMask(selector).mask(SPMaskBehavior.apply({}, arguments), options);
-      }
+      },
    };
 
 new RMask('.sp_celphones').mask(SPMaskBehavior, spOptions);
