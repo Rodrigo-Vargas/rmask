@@ -31,7 +31,8 @@ class Mask {
          setCaret: function (pos) {
             try {
                if (el.matches(':focus')) {
-                  var range, ctrl = el;
+                  var range,
+                     ctrl = el;
 
                   // Firefox, WebKit, etc..
                   if (ctrl.setSelectionRange) {
@@ -98,7 +99,13 @@ class Mask {
             });
          },
          getRegexMask: function () {
-            var maskChunks = [], translation, pattern, optional, recursive, oRecursive, r;
+            var maskChunks = [],
+               translation,
+               pattern,
+               optional,
+               recursive,
+               oRecursive,
+               r;
 
             for (var i = 0; i < mask.length; i++) {
                translation = jMask.translation[mask.charAt(i)];
@@ -190,9 +197,12 @@ class Mask {
          getMasked: function (skipMaskChars, val) {
             var buf = [],
                value = val === undefined ? this.val() : val + '',
-               m = 0, maskLen = mask.length,
-               v = 0, valLen = value.length,
-               offset = 1, addMethod = 'push',
+               m = 0,
+               maskLen = mask.length,
+               v = 0,
+               valLen = value.length,
+               offset = 1,
+               addMethod = 'push',
                resetPos = -1,
                lastMaskChar,
                check;
@@ -289,7 +299,9 @@ class Mask {
          },
       };
 
-      var jMask = this, oldValue = this.p.val(), regexMask;
+      var jMask = this,
+         oldValue = this.p.val(),
+         regexMask;
 
       mask = typeof mask === 'function' ? mask(this.p.val(), undefined, el, options) : mask;
 

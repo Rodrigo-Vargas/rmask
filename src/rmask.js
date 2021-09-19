@@ -119,11 +119,11 @@ UserData.prototype = {
       return cache;
    },
    get: function (owner, key) {
-      return key === undefined ?
-         this.cache(owner) :
+      return key === undefined
+         ? this.cache(owner)
 
          // Always use camelCase key (gh-2257)
-         owner[this.expando] && owner[this.expando][camelCase(key)];
+         : owner[this.expando] && owner[this.expando][camelCase(key)];
    },
    access: function (owner, key, value) {
       // In cases where either:
@@ -137,8 +137,8 @@ UserData.prototype = {
       //   1. The entire cache object
       //   2. The data stored at the key
       //
-      if (key === undefined ||
-         ((key && typeof key === "string") && value === undefined)) {
+      if (key === undefined
+         || ((key && typeof key === "string") && value === undefined)) {
          return this.get(owner, key);
       }
 
@@ -173,9 +173,9 @@ UserData.prototype = {
 
             // If a key with the spaces exists, use it.
             // Otherwise, create an array by matching non-whitespace
-            key = key in cache ?
-               [key] :
-               (key.match(rnothtmlwhite) || []);
+            key = key in cache
+               ? [key]
+               : (key.match(rnothtmlwhite) || []);
          }
 
          i = key.length;
@@ -228,7 +228,8 @@ function camelCase(string) {
 }
 
 window.each = function(obj, callback) {
-   var length, i = 0;
+   var length,
+      i = 0;
 
    if (isArrayLike(obj)) {
       length = obj.length;
@@ -296,9 +297,9 @@ window.access = function(elems, fn, key, value, chainable, emptyGet, raw) {
       if (fn) {
          for (; i < len; i++) {
             fn(
-               elems[i], key, raw ?
-               value :
-               value.call(elems[i], i, fn(elems[i], key)),
+               elems[i], key, raw
+               ? value
+               : value.call(elems[i], i, fn(elems[i], key)),
             );
          }
       }
@@ -321,13 +322,15 @@ window.toType = function(obj) {
       return obj + "";
    }
 
-   return typeof obj === "object" ?
-      class2type[toString.call(obj)] || "object" :
-      typeof obj;
+   return typeof obj === "object"
+      ? class2type[toString.call(obj)] || "object"
+      : typeof obj;
 }
 
 window.data = function(element, key, value) {
-   var i, name, data,
+   var i,
+      name,
+      data,
       elem = element.lenght > 0 ? element[0] : element,
       attrs = elem && elem.attributes;
 
@@ -409,8 +412,8 @@ window.isArrayLike = function(obj) {
       return false;
    }
 
-   return type === "array" || length === 0 ||
-      typeof length === "number" && length > 0 && (length - 1) in obj;
+   return type === "array" || length === 0
+      || typeof length === "number" && length > 0 && (length - 1) in obj;
 }
 
 window.dataUser = new UserData();

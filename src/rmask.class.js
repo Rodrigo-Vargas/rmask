@@ -99,7 +99,8 @@ class RMask {
    }
 
    eventSupported(eventName) {
-      var el = document.createElement('div'), isSupported;
+      var el = document.createElement('div'),
+         isSupported;
 
       eventName = 'on' + eventName;
       isSupported = (eventName in el);
