@@ -284,7 +284,7 @@ class Mask {
             callback('onKeyPress', changed === true, defaultArgs);
             callback('onComplete', val.length === mask.length, defaultArgs);
             callback('onInvalid', this.invalid.length > 0, [val, e, el, this.invalid, options]);
-         }
+         },
       };
 
       var jMask = this, oldValue = this.p.val(), regexMask;

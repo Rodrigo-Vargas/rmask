@@ -19,14 +19,13 @@ class RMask {
             '9': { pattern: /\d/, optional: true },
             '#': { pattern: /\d/, recursive: true },
             'A': { pattern: /[a-zA-Z0-9]/ },
-            'S': { pattern: /[a-zA-Z]/ }
-         }
+            'S': { pattern: /[a-zA-Z]/ },
+         },
       };
 
       this.globals = this.extend({}, this.globals, window.jMaskGlobals);
 
-      if (typeof selector === "string")
-         this.elem = document.querySelector(selector);
+      if (typeof selector === "string") { this.elem = document.querySelector(selector); }
 
       this.HTMLAttributes = function () {
          var input = $(this),
@@ -70,10 +69,14 @@ class RMask {
    }
 
    extend() {
-      for (var i = 1; i < arguments.length; i++)
-         for (var key in arguments[i])
-            if (arguments[i].hasOwnProperty(key))
+      for (var i = 1; i < arguments.length; i++) {
+         for (var key in arguments[i]) {
+            if (arguments[i].hasOwnProperty(key)) {
                arguments[0][key] = arguments[i][key];
+            }
+         }
+      }
+
 
       return arguments[0];
    }
@@ -111,8 +114,7 @@ class RMask {
    };
 
    maskFunction(mask, options) {
-      if (!this.notSameMaskObject(this.elem, mask, options))
-         return;
+      if (!this.notSameMaskObject(this.elem, mask, options)) { return; }
 
       return window.data(this.elem, 'mask', new Mask(this.elem, this.selector, mask, options));
    };

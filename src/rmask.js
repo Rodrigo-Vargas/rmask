@@ -94,7 +94,7 @@ UserData.prototype = {
             } else {
                Object.defineProperty(owner, this.expando, {
                   value: value,
-                  configurable: true
+                  configurable: true,
                });
             }
          }
@@ -209,7 +209,7 @@ UserData.prototype = {
    hasData: function (owner) {
       var cache = owner[this.expando];
       return cache !== undefined && !jQuery.isEmptyObject(cache);
-   }
+   },
 };
 
 function acceptData(owner) {
@@ -308,7 +308,7 @@ window.access = function(elems, fn, key, value, chainable, emptyGet, raw) {
             fn(
                elems[i], key, raw ?
                value :
-               value.call(elems[i], i, fn(elems[i], key))
+               value.call(elems[i], i, fn(elems[i], key)),
             );
          }
       }
