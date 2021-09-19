@@ -111,13 +111,13 @@ class RMask {
       el = null;
 
       return isSupported;
-   };
+   }
 
    maskFunction(mask, options) {
       if (!this.notSameMaskObject(this.elem, mask, options)) { return; }
 
       return window.data(this.elem, 'mask', new Mask(this.elem, this.selector, mask, options));
-   };
+   }
 
    mask(mask, options) {
       options = options || {};
@@ -140,11 +140,11 @@ class RMask {
       // }
 
       return this;
-   };
+   }
 
    masked(val) {
       return this.data('mask').getMaskedVal(val);
-   };
+   }
 
    unmask() {
       clearInterval(this.maskWatchers[this.selector]);
@@ -156,11 +156,11 @@ class RMask {
             dataMask.remove().removeData('mask');
          }
       });
-   };
+   }
 
    cleanVal() {
       return data(this, 'mask').getCleanVal();
-   };
+   }
 
    applyDataMask(selector) {
       selector = selector || this.globals.maskElements;
@@ -168,7 +168,7 @@ class RMask {
       var elements = document.querySelectorAll(this.globals.dataMaskAttr);
 
       elements.forEach(this.HTMLAttributes);
-   };
+   }
 }
 
 export default RMask;

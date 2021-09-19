@@ -369,6 +369,6 @@ class Mask {
 
       jMask.init(!el.matches('input'));
    }
-};
+}
 
 export default Mask;
