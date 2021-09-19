@@ -24,12 +24,14 @@ class Mask {
                }
 
                return pos;
-            } catch (e) { }
+            } catch (e) {
+               console.warn(e);
+            }
          },
          setCaret: function (pos) {
             try {
-               if (el.is(':focus')) {
-                  var range, ctrl = el.get(0);
+               if (el.matches(':focus')) {
+                  var range, ctrl = el;
 
                   // Firefox, WebKit, etc..
                   if (ctrl.setSelectionRange) {
@@ -42,7 +44,9 @@ class Mask {
                      range.select();
                   }
                }
-            } catch (e) { }
+            } catch (e) {
+               console.warn(e);
+            }
          },
          events: function () {
             var that = this;
