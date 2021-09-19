@@ -86,14 +86,14 @@ class Mask {
             // select all text on focus
             el.addEventListener('focus.mask', function (e) {
                if (options.selectOnFocus === true) {
-                  $(e.target).select();
+                  e.target.select();
                }
             });
 
             // clear the value if it not complete the mask
             el.addEventListener('focusout.mask', function () {
-               if (options.clearIfNotMatch && !regexMask.test(this.val())) {
-                  this.val('');
+               if (options.clearIfNotMatch && !regexMask.test(this.value)) {
+                  this.value = '';
                }
             });
          },
