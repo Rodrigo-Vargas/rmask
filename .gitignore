@@ -2,3 +2,7 @@ node_modules/
 test/
 .jekyll-cache
 _site
+
+# Compiled Lib
+lib
+dist
